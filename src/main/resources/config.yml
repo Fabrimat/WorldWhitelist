@@ -1,0 +1,24 @@
+default_world: world
+whitelist_worlds:
+  - whitelisted_world
+
+users:
+  whitelisted_world:
+    - 3f646b10-55f4-4374-85b9-f61cd10a036f
+message:
+  prefix: "&7[&6WorldWhitelist&7]&r "
+  no_access_world: "&cYou do not have access to this world"
+  config_reloaded: "&eConfiguration reloaded"
+  whitelist_enabled: "&eWorld&6 %s &ewhitelist enabled"
+  whitelist_already_enabled: "&cWorld&6 %s &cwhitelist already enabled"
+  whitelist_disabled: "&eWorld&6 %s &ewhitelist disabled"
+  whitelist_already_disabled: "&cWorld&6 %s &cwhitelist already disabled"
+  user_added: "&ePlayer&6 %2$s &eadded to the world's&6 %1$s &ewhitelist"
+  user_already_added: "&cPlayer&6 %2$s &cis already in the world's&6 %1$s &cwhitelist"
+  user_removed: "&ePlayer&6 %2$s &eremoved to the world's&6 %1$s &ewhitelist"
+  user_already_removed: "&cPlayer&6 %2$s &cis not in the world's&6 %1$s &cwhitelist"
+  user_not_specified: "&ePlayer not specified"
+  whitelist_list: "&eWorld&6 %1$s &ewhitelist: %2$s"
+  world_not_valid: "&cWorld not valid"
+  command_not_valid: "&cCommand not valid"
+  no_permission: "&cYou don't have the permission!"

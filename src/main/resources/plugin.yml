@@ -1,0 +1,28 @@
+main: eu.k129.fabrimat.worldwhitelist.WorldWhitelist
+name: WorldWhitelist
+version: '${project.version}'
+description: Whitelist for each world
+load: POSTWORLD
+author: Fabrimat
+website: k129.eu
+api-version: 1.13
+commands:
+    worldwhitelist:
+        description: Manage World Whitelist
+        aliases:
+            - wwhitelist
+            - ww
+        usage: /<command> <world> [on|off|add|remove|list]
+    worldwhitelistreload:
+        description: Manage World Whitelist
+        aliases:
+            - wwhitelistreload
+            - wwreload
+        usage: /<command>
+permissions:
+    worldwhitelist.admin.reload:
+        description: Permission for reloading the plugin
+        default: op
+    worldwhitelist.world.*:
+        description: Wildcard permission for all worlds
+        default: op
