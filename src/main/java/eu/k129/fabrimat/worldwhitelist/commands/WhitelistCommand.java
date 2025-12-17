@@ -21,85 +21,111 @@ public class WhitelistCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
         Bukkit.getScheduler().runTaskAsynchronously(WorldWhitelist.getInstance(), () -> {
             ConfigManager configManager = ConfigManager.get();
-    
-            if(args.length > 0) {
+
+            if (args.length > 0) {
                 World world = Bukkit.getWorld(args[0]);
                 String worldName = args[0];
-                if(world != null) {
+                if (world != null) {
                     switch (args[1].toLowerCase()) {
                         case "on":
-                            if(!commandSender.hasPermission("worldwhitelist.world." + worldName + ".on")) {
+                            if (!commandSender.hasPermission("worldwhitelist.world." + worldName + ".on")) {
                                 commandSender.sendMessage(configManager.getMessage("no_permission"));
                                 return;
                             }
-                            
-                            if(!configManager.isWorldWhitelisted(worldName)) {
+
+                            if (!configManager.isWorldWhitelisted(worldName)) {
                                 configManager.setWorldWhitelisted(worldName, true);
-                                commandSender.sendMessage(String.format(configManager.getMessage("whitelist_enabled"), worldName));
+                                commandSender.sendMessage(
+                                        String.format(configManager.getMessage("whitelist_enabled"), worldName));
+                                WorldWhitelist.getInstance().getLogger()
+                                        .info("Whitelist enabled for world " + worldName);
                             } else {
-                                commandSender.sendMessage(String.format(configManager.getMessage("whitelist_already_enabled"), worldName));
+                                commandSender.sendMessage(String
+                                        .format(configManager.getMessage("whitelist_already_enabled"), worldName));
                             }
                             break;
                         case "off":
-                            if(!commandSender.hasPermission("worldwhitelist.world." + worldName + ".off")) {
+                            if (!commandSender.hasPermission("worldwhitelist.world." + worldName + ".off")) {
                                 commandSender.sendMessage(configManager.getMessage("no_permission"));
                                 return;
                             }
-                            if(configManager.isWorldWhitelisted(worldName)) {
+                            if (configManager.isWorldWhitelisted(worldName)) {
                                 configManager.setWorldWhitelisted(worldName, false);
-                                commandSender.sendMessage(String.format(configManager.getMessage("whitelist_disabled"), worldName));
+                                commandSender.sendMessage(
+                                        String.format(configManager.getMessage("whitelist_disabled"), worldName));
+                                WorldWhitelist.getInstance().getLogger()
+                                        .info("Whitelist disabled for world " + worldName);
                             } else {
-                                commandSender.sendMessage(String.format(configManager.getMessage("whitelist_already_disabled"), worldName));
+                                commandSender.sendMessage(String
+                                        .format(configManager.getMessage("whitelist_already_disabled"), worldName));
                             }
                             break;
                         case "add":
-                            if(!commandSender.hasPermission("worldwhitelist.world." + worldName + ".add")) {
+                            if (!commandSender.hasPermission("worldwhitelist.world." + worldName + ".add")) {
                                 commandSender.sendMessage(configManager.getMessage("no_permission"));
                                 return;
                             }
-                            if(args.length == 3) {
+                            if (args.length == 3) {
                                 String playerName = args[2];
-                                if(!configManager.isUserWhitelisted(playerName, worldName)) {
-                                    configManager.setUserWhitelisted(playerName, worldName, true);
-                                    commandSender.sendMessage(String.format(configManager.getMessage("user_added"), worldName, playerName));
+                                OfflinePlayer targetPlayer = Bukkit.getOfflinePlayer(playerName);
+
+                                // Check if player has ever played on the server
+                                if (!targetPlayer.hasPlayedBefore() && !targetPlayer.isOnline()) {
+                                    commandSender.sendMessage(
+                                            String.format(configManager.getMessage("player_not_found"), playerName));
+                                    return;
+                                }
+
+                                if (!configManager.isUserWhitelisted(targetPlayer.getUniqueId(), worldName)) {
+                                    configManager.setUserWhitelisted(targetPlayer.getUniqueId(), worldName, true);
+                                    commandSender.sendMessage(String.format(configManager.getMessage("user_added"),
+                                            worldName, playerName));
+                                    WorldWhitelist.getInstance().getLogger()
+                                            .info("Added " + playerName + " to whitelist of world " + worldName);
                                 } else {
-                                    commandSender.sendMessage(String.format(configManager.getMessage("user_already_added"), worldName, playerName));
+                                    commandSender.sendMessage(String.format(
+                                            configManager.getMessage("user_already_added"), worldName, playerName));
                                 }
                             } else {
                                 commandSender.sendMessage(configManager.getMessage("user_not_specified"));
                             }
                             break;
                         case "remove":
-                            if(!commandSender.hasPermission("worldwhitelist.world." + worldName + ".remove")) {
+                            if (!commandSender.hasPermission("worldwhitelist.world." + worldName + ".remove")) {
                                 commandSender.sendMessage(configManager.getMessage("no_permission"));
                                 return;
                             }
-                            if(args.length == 3) {
+                            if (args.length == 3) {
                                 String playerName = args[2];
-                                if(configManager.isUserWhitelisted(playerName, worldName)) {
+                                if (configManager.isUserWhitelisted(playerName, worldName)) {
                                     configManager.setUserWhitelisted(playerName, worldName, false);
-                                    commandSender.sendMessage(String.format(configManager.getMessage("user_removed"), worldName, playerName));
+                                    commandSender.sendMessage(String.format(configManager.getMessage("user_removed"),
+                                            worldName, playerName));
+                                    WorldWhitelist.getInstance().getLogger()
+                                            .info("Removed " + playerName + " from whitelist of world " + worldName);
                                 } else {
-                                    commandSender.sendMessage(String.format(configManager.getMessage("user_already_removed"), worldName, playerName));
+                                    commandSender.sendMessage(String.format(
+                                            configManager.getMessage("user_already_removed"), worldName, playerName));
                                 }
                             } else {
                                 commandSender.sendMessage(configManager.getMessage("user_not_specified"));
                             }
                             break;
                         case "list":
-                            if(!commandSender.hasPermission("worldwhitelist.world." + worldName + ".list")) {
+                            if (!commandSender.hasPermission("worldwhitelist.world." + worldName + ".list")) {
                                 commandSender.sendMessage(configManager.getMessage("no_permission"));
                                 return;
                             }
                             List<String> uuidList = configManager.getWhitelistedUsers(worldName);
                             List<String> usersList = new ArrayList<>();
-                            for(String uuidString : uuidList) {
+                            for (String uuidString : uuidList) {
                                 UUID uuid = UUID.fromString(uuidString);
                                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
                                 usersList.add(offlinePlayer.getName());
                             }
                             String usersString = String.join(", ", usersList);
-                            commandSender.sendMessage(String.format(configManager.getMessage("whitelist_list"), worldName, usersString));
+                            commandSender.sendMessage(
+                                    String.format(configManager.getMessage("whitelist_list"), worldName, usersString));
                             break;
                         default:
                             commandSender.sendMessage(configManager.getMessage("command_not_valid"));
@@ -112,34 +138,34 @@ public class WhitelistCommand implements CommandExecutor, TabCompleter {
         });
         return true;
     }
-    
+
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
         ConfigManager configManager = ConfigManager.get();
         List<String> tempValues = new ArrayList<>();
         List<String> returnValues = new ArrayList<>();
-        if(args.length == 1) {
-            for(World world : Bukkit.getWorlds()) {
+        if (args.length == 1) {
+            for (World world : Bukkit.getWorlds()) {
                 tempValues.add(world.getName());
             }
             StringUtil.copyPartialMatches(args[0], tempValues, returnValues);
-        } else if(args.length == 2) {
+        } else if (args.length == 2) {
             tempValues.add("on");
             tempValues.add("off");
             tempValues.add("add");
             tempValues.add("remove");
             tempValues.add("list");
             StringUtil.copyPartialMatches(args[1], tempValues, returnValues);
-        } else if(args.length == 3) {
+        } else if (args.length == 3) {
             switch (args[1]) {
                 case "add":
-                    for(Player player: Bukkit.getOnlinePlayers()) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
                         tempValues.add(player.getName());
                     }
                     break;
                 case "remove":
                     List<String> uuidList = configManager.getWhitelistedUsers(args[0]);
-                    for(String uuidString : uuidList) {
+                    for (String uuidString : uuidList) {
                         UUID uuid = UUID.fromString(uuidString);
                         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
                         tempValues.add(offlinePlayer.getName());

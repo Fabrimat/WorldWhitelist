@@ -18,6 +18,7 @@ message:
   user_removed: "&ePlayer&6 %2$s &eremoved to the world's&6 %1$s &ewhitelist"
   user_already_removed: "&cPlayer&6 %2$s &cis not in the world's&6 %1$s &cwhitelist"
   user_not_specified: "&ePlayer not specified"
+  player_not_found: "&cPlayer&6 %s &cnot found or has never played on this server"
   whitelist_list: "&eWorld&6 %1$s &ewhitelist: %2$s"
   world_not_valid: "&cWorld not valid"
   command_not_valid: "&cCommand not valid"
